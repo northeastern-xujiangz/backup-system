@@ -1,7 +1,7 @@
 # cdk/stacks/replicator_stack.py
 from aws_cdk import (
     Stack,
-    Duration,  # Direct import of Duration
+    Duration,
     aws_lambda as _lambda,
     aws_s3 as s3,
     aws_dynamodb as dynamodb,
@@ -9,7 +9,6 @@ from aws_cdk import (
     aws_s3_notifications as s3n
 )
 from constructs import Construct
-from typing import Any
 
 class ReplicatorStack(Stack):
     def __init__(
@@ -29,12 +28,12 @@ class ReplicatorStack(Stack):
             "ReplicatorLambda",
             runtime=_lambda.Runtime.PYTHON_3_9,
             handler="replicator.handler",
-            code=_lambda.Code.from_asset("cdk/lambda/replicator"),
+            code=_lambda.Code.from_asset("lambda/replicator"),
             environment={
                 "BUCKET_DST": bucket_dst.bucket_name,
                 "TABLE_NAME": table.table_name
             },
-            timeout=Duration.seconds(30)  # Use Duration directly
+            timeout=Duration.seconds(30)
         )
 
         # Grant necessary permissions
@@ -43,11 +42,14 @@ class ReplicatorStack(Stack):
         table.grant_read_write_data(replicator_lambda)
 
         # Add S3 event notifications to trigger Replicator Lambda
-        notification_filter = s3.NotificationKeyFilter(prefix="")
+        bucket_src.add_event_notification(
+            s3.EventType.OBJECT_CREATED_PUT,
+            s3n.LambdaDestination(replicator_lambda)
+        )
 
-        replicator_lambda.add_event_source(
-            s3n.LambdaDestination(replicator_lambda),
-            events=[s3.EventType.OBJECT_CREATED_PUT, s3.EventType.OBJECT_REMOVED_DELETE]
+        bucket_src.add_event_notification(
+            s3.EventType.OBJECT_REMOVED_DELETE,
+            s3n.LambdaDestination(replicator_lambda)
         )
 
         # Allow Lambda to be invoked by S3

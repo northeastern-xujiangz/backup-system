@@ -48,7 +48,7 @@ class StorageStack(Stack):
             index_name="DisownedIndex",
             partition_key=dynamodb.Attribute(
                 name="Disowned",
-                type=dynamodb.AttributeType.STRING  # Changed from BOOLEAN to STRING
+                type=dynamodb.AttributeType.STRING  # Changed to STRING
             ),
             sort_key=dynamodb.Attribute(
                 name="DisownTimestamp",
