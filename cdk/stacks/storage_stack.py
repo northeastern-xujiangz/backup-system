@@ -11,7 +11,6 @@ class StorageStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Source S3 Bucket
         self.bucket_src = s3.Bucket(
             self,
             "BucketSrc",
@@ -19,7 +18,6 @@ class StorageStack(Stack):
             auto_delete_objects=True
         )
 
-        # Destination S3 Bucket
         self.bucket_dst = s3.Bucket(
             self,
             "BucketDst",
@@ -27,7 +25,6 @@ class StorageStack(Stack):
             auto_delete_objects=True
         )
 
-        # DynamoDB Table
         self.backup_table = dynamodb.Table(
             self,
             "BackupTable",
@@ -43,7 +40,6 @@ class StorageStack(Stack):
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST
         )
 
-        # Global Secondary Index for Disowned Copies
         self.backup_table.add_global_secondary_index(
             index_name="DisownedIndex",
             partition_key=dynamodb.Attribute(

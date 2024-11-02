@@ -21,7 +21,6 @@ class CleanerStack(Stack):
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Cleaner Lambda Function
         cleaner_lambda = _lambda.Function(
             self,
             "CleanerLambda",
@@ -37,11 +36,9 @@ class CleanerStack(Stack):
             timeout=Duration.seconds(30)
         )
 
-        # Grant necessary permissions
         bucket_dst.grant_read_write(cleaner_lambda)
         table.grant_read_write_data(cleaner_lambda)
 
-        # Schedule the Cleaner Lambda to run every 1 minute using EventBridge
         rule = events.Rule(
             self,
             "CleanerScheduleRule",

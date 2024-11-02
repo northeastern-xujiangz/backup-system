@@ -6,10 +6,8 @@ from stacks.cleaner_stack import CleanerStack
 
 app = cdk.App()
 
-# Initialize Storage Stack first
 storage_stack = StorageStack(app, "StorageStack")
 
-# Initialize Replicator Stack, passing references from Storage Stack
 replicator_stack = ReplicatorStack(
     app,
     "ReplicatorStack",
@@ -18,7 +16,6 @@ replicator_stack = ReplicatorStack(
     table=storage_stack.backup_table
 )
 
-# Initialize Cleaner Stack, passing references from Storage Stack
 cleaner_stack = CleanerStack(
     app,
     "CleanerStack",

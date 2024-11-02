@@ -22,7 +22,6 @@ class ReplicatorStack(Stack):
     ) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Replicator Lambda Function
         replicator_lambda = _lambda.Function(
             self,
             "ReplicatorLambda",
@@ -36,12 +35,10 @@ class ReplicatorStack(Stack):
             timeout=Duration.seconds(30)
         )
 
-        # Grant necessary permissions
         bucket_dst.grant_read_write(replicator_lambda)
         bucket_src.grant_read(replicator_lambda)
         table.grant_read_write_data(replicator_lambda)
 
-        # Add S3 event notifications to trigger Replicator Lambda
         bucket_src.add_event_notification(
             s3.EventType.OBJECT_CREATED_PUT,
             s3n.LambdaDestination(replicator_lambda)
@@ -52,7 +49,6 @@ class ReplicatorStack(Stack):
             s3n.LambdaDestination(replicator_lambda)
         )
 
-        # Allow Lambda to be invoked by S3
         replicator_lambda.add_permission(
             "AllowS3Invoke",
             principal=iam.ServicePrincipal("s3.amazonaws.com"),

@@ -17,7 +17,6 @@ def handler(event, context):
     now = int(time.time() * 1000)
     threshold = now - (CLEAN_THRESHOLD_SECONDS * 1000)
     
-    # Query disowned copies older than threshold
     response = table.query(
         IndexName=GSI_NAME,
         KeyConditionExpression='Disowned = :disowned AND DisownTimestamp <= :threshold',
@@ -31,11 +30,9 @@ def handler(event, context):
     print(f"Found {len(items)} disowned copies to clean.")
     
     for item in items:
-        # Delete the copy from S3
         s3_client.delete_object(Bucket=BUCKET_DST, Key=item['CopyObjectName'])
         print(f"Deleted disowned copy: {item['CopyObjectName']}")
         
-        # Remove the item from DynamoDB
         table.delete_item(
             Key={
                 'OriginalObjectName': item['OriginalObjectName'],
