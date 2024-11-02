@@ -12,6 +12,7 @@ dynamodb = boto3.resource('dynamodb')
 BUCKET_DST = os.environ['BUCKET_DST']
 TABLE_NAME = os.environ['TABLE_NAME']
 table = dynamodb.Table(TABLE_NAME)
+bucket_src = ""
 
 def handler(event, context):
     print("Received event:", json.dumps(event, indent=2))
